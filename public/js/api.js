@@ -1,6 +1,14 @@
 // Shared fetch() wrapper. Attaches the CSRF token (stored in sessionStorage
 // after login) to every mutating request as the X-CSRF-Token header.
 
+// Backend base URL from js/config.js (loaded before this file).
+// '' = same origin as the page (default). Trailing slashes are
+// stripped so API_BASE_URL + '/api/...' never produces a double
+// slash. Falls back to '' if config.js was not loaded.
+var API_BASE_URL = (typeof API_BASE !== 'undefined' && API_BASE)
+  ? API_BASE.replace(/\/+$/, '')
+  : '';
+
 const Northstar = (() => {
   function getCsrfToken() {
     return sessionStorage.getItem('ns_csrf') || '';
@@ -27,7 +35,7 @@ const Northstar = (() => {
       headers['X-CSRF-Token'] = getCsrfToken();
     }
 
-    const response = await fetch(path, {
+    const response = await fetch(API_BASE_URL + path, {
       method,
       headers,
       credentials: 'same-origin',
