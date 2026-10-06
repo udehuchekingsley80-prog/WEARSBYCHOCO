@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="js/origin-guard.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Northstar Financial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-visual">
+      <h1>Your finances, in one clear view.</h1>
+      <p>Checking, high-yield savings, cards, and transfers — Northstar Financial keeps everything precise, current, and secure.</p>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-form-box">
+        <div class="brand"><span class="brand-mark">N</span><span>Northstar Financial</span></div>
+        <h2>Welcome back</h2>
+        <div class="auth-subtitle">Sign in to access your accounts.</div>
+
+        <div class="auth-error-box" id="login-error"></div>
+
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-input" type="text" id="username" name="username" autocomplete="username" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-input" type="password" id="password" name="password" autocomplete="current-password" required>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit" id="login-submit">
+            <span id="login-submit-label">Sign In</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

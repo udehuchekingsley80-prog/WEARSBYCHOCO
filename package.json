@@ -1,0 +1,30 @@
+{
+  "name": "northstar-financial",
+  "version": "1.0.0",
+  "description": "Northstar Financial — a full-stack fictional digital banking application",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "setup": "node seed.js",
+    "reset-db": "node seed.js --reset",
+    "db:start": "node scripts/start-mongod.js",
+    "db:init-replica-set": "node scripts/init-replica-set.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-mongo": "^5.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "express-session": "^1.18.0",
+    "express-validator": "^7.2.0",
+    "helmet": "^7.1.0",
+    "mongoose": "^8.6.0",
+    "nodemailer": "^9.1.1"
+  },
+  "overrides": {
+    "qs": "^6.16.0"
+  }
+}

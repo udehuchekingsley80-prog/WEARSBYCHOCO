@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="js/origin-guard.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity — Northstar Financial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar-slot"></aside>
+
+    <div class="main-area">
+      <div class="mobile-topbar">
+        <div class="brand"><span class="brand-mark">N</span><span>Northstar</span></div>
+        <a href="notifications.html" class="bell-btn" aria-label="Notifications" style="color:#fff;">
+          <span class="bell-dot"></span>
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        </a>
+      </div>
+
+      <header class="topbar">
+        <h1 id="topbar-title">Activity</h1>
+        <div class="topbar-right">
+          <a href="notifications.html" class="bell-btn" aria-label="Notifications">
+            <span class="bell-dot"></span>
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          </a>
+          <a href="profile.html" class="user-chip">
+            <span class="avatar" id="user-avatar"></span>
+            <span class="user-chip-name" id="user-chip-name"></span>
+          </a>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="card mb-16">
+          <div class="form-row" style="grid-template-columns: 1.4fr 1fr 1fr 1fr;">
+            <div class="form-group">
+              <label class="form-label" for="search-input">Search</label>
+              <input class="form-input" type="text" id="search-input" placeholder="Description or merchant">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="account-filter">Account</label>
+              <select class="form-select" id="account-filter"><option value="">All accounts</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="card-filter">Card</label>
+              <select class="form-select" id="card-filter"><option value="">All cards</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="direction-filter">Direction</label>
+              <select class="form-select" id="direction-filter">
+                <option value="">All</option>
+                <option value="credit">Credit</option>
+                <option value="debit">Debit</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="start-date">From date</label>
+              <input class="form-input" type="date" id="start-date">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="end-date">To date</label>
+              <input class="form-input" type="date" id="end-date">
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrapper" id="tx-wrapper">
+          <div style="padding:16px;"></div>
+        </div>
+
+        <div class="flex justify-between items-center mt-16">
+          <span class="text-sm text-muted" id="page-info"></span>
+          <div class="flex gap-8">
+            <button class="btn btn-outline btn-sm" id="prev-page-btn" type="button">Previous</button>
+            <button class="btn btn-outline btn-sm" id="next-page-btn" type="button">Next</button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <nav class="mobile-tabbar" id="mobile-tabbar-slot"></nav>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/money.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/transactions.js"></script>
+</body>
+</html>
