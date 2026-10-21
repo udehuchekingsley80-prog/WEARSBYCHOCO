@@ -153,10 +153,8 @@ process.on('uncaughtException', (err) => {
   console.error('Uncaught exception (server kept running):', err);
 });
 
-// Bind explicitly to the IPv4 loopback address. Leaving the host unspecified
-// binds to the dual-stack "::" address, which some Windows/browser network
-// configurations don't reliably reach over "localhost" — binding to
-// 127.0.0.1 directly avoids that IPv6-vs-IPv4 ambiguity entirely.
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`Northstar Financial listening on http://127.0.0.1:${PORT} (also reachable at http://localhost:${PORT})`);
+// Render (and most hosts) need the server on 0.0.0.0 so it's reachable
+// from outside the container. Locally it still works at http://localhost:PORT.
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Northstar Financial listening on port ${PORT}`);
 });
