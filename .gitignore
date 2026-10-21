@@ -5,3 +5,4 @@ data/db/
 .mongo-install/
 npm-debug.log
 *.log
+.kilo/
