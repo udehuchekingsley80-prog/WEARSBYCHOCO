@@ -98,7 +98,7 @@ function buildDebitNotificationEmail({
 }) {
   const bodyHtml = `
     <p style="color:${INK_900};font-size:14px;line-height:1.6;margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;">
-      Hello ${escapeHtml(recipientTitle)} ${escapeHtml(recipientName)}, a transfer was sent from your account. Here are the details:
+      Hello ${escapeHtml([recipientTitle, recipientName].filter(Boolean).join(' '))}, a transfer was sent from your account. Here are the details:
     </p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
       ${detailRow('From account', `${escapeHtml(accountNickname)} •••${escapeHtml(accountLast4)}`)}

@@ -3,7 +3,7 @@
   if (!user) return;
 
   const greeting = document.getElementById('greeting');
-  greeting.textContent = `Hello, welcome, ${user.title || 'Mr.'} ${user.lastName}.`;
+  greeting.textContent = `Hello, welcome, ${fullNameOf(user)}.`;
 
   await loadDashboard();
 

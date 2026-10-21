@@ -2,6 +2,11 @@
 // Injected into every authenticated page so the chrome stays identical
 // across the app; each page's own <main> content remains real static HTML.
 
+// Profile picture for the account holder. Served from the same origin, so it
+// satisfies the strict `img-src 'self'` CSP. If the file is missing the
+// avatar falls back to the account holder's initials.
+const PROFILE_IMAGE = '/images/kevin.jpg';
+
 const ICONS = {
   dashboard: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
   accounts: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></svg>',
@@ -49,14 +54,49 @@ function initials(firstName, lastName) {
   return `${(firstName || '').charAt(0)}${(lastName || '').charAt(0)}`.toUpperCase();
 }
 
+// The account holder's display name, e.g. "Kevin Lutolf".
+function fullNameOf(user) {
+  if (!user) return '';
+  return `${user.firstName || ''} ${user.lastName || ''}`.trim();
+}
+
+// Renders the profile picture inside a .avatar element, falling back to the
+// account holder's initials whenever the image cannot be loaded.
+function applyAvatar(el, user) {
+  if (!el) return;
+  const fallback = initials(user && user.firstName, user && user.lastName);
+  const name = fullNameOf(user);
+
+  el.textContent = '';
+  el.classList.remove('avatar-text');
+
+  const img = document.createElement('img');
+  img.className = 'avatar-img';
+  img.alt = name || 'Profile picture';
+  img.addEventListener('error', () => {
+    img.remove();
+    el.textContent = fallback;
+    el.classList.add('avatar-text');
+  });
+  img.src = PROFILE_IMAGE;
+  el.appendChild(img);
+}
+
 function navLinkHtml(item, activeKey) {
   const active = item.key === activeKey ? ' active' : '';
   return `<a href="${item.href}" class="${active.trim()}">${ICONS[item.icon]}<span>${item.label}</span></a>`;
 }
 
-function buildSidebar(activeKey) {
+function buildSidebar(activeKey, user) {
+  const userBlock = user ? `
+    <div class="sidebar-user">
+      <span class="avatar" id="sidebar-avatar"></span>
+      <span class="sidebar-user-name">${escapeHtml(fullNameOf(user))}</span>
+    </div>` : '';
+
   return `
     <div class="brand"><span class="brand-mark">N</span><span>Northstar Financial</span></div>
+    ${userBlock}
     <nav class="sidebar-nav">
       ${NAV_ITEMS.map((item) => navLinkHtml(item, activeKey)).join('')}
       <div class="sidebar-divider"></div>
@@ -110,16 +150,19 @@ async function initShell(activeKey, pageTitle) {
   if (!user) return null;
 
   const sidebarSlot = document.getElementById('sidebar-slot');
-  if (sidebarSlot) sidebarSlot.innerHTML = buildSidebar(activeKey);
+  if (sidebarSlot) sidebarSlot.innerHTML = buildSidebar(activeKey, user);
 
   const topbarTitle = document.getElementById('topbar-title');
   if (topbarTitle) topbarTitle.textContent = pageTitle;
 
   const userChipName = document.getElementById('user-chip-name');
-  if (userChipName) userChipName.textContent = `${user.title || ''} ${user.lastName || ''}`.trim();
+  if (userChipName) userChipName.textContent = fullNameOf(user);
 
   const avatarEl = document.getElementById('user-avatar');
-  if (avatarEl) avatarEl.textContent = initials(user.firstName, user.lastName);
+  applyAvatar(avatarEl, user);
+
+  const sidebarAvatarEl = document.getElementById('sidebar-avatar');
+  applyAvatar(sidebarAvatarEl, user);
 
   const mobileTabbar = document.getElementById('mobile-tabbar-slot');
   if (mobileTabbar) mobileTabbar.innerHTML = buildMobileTabbar(activeKey);

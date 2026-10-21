@@ -208,10 +208,10 @@ router.post('/confirm', transferValidators, pinValidators, handleValidation, asy
       month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
     });
     const amountText = formatCents(transfer.amountCents);
-    const senderFullName = `${user.title} ${user.firstName} ${user.lastName}`.trim();
+    const senderFullName = `${user.firstName} ${user.lastName}`.trim();
 
     const ownerEmailBody = [
-      `Hello ${user.title} ${user.lastName},`,
+      `Hello ${senderFullName},`,
       '',
       `A transfer of ${amountText} was sent from your ${account.nickname} (account ending ${account.accountNumber.slice(-4)}) to ${transfer.recipientName}.`,
       `Transfer type: ${transfer.transferType}`,
@@ -223,8 +223,8 @@ router.post('/confirm', transferValidators, pinValidators, handleValidation, asy
     ].filter(Boolean).join('\n');
 
     const ownerEmailHtml = buildDebitNotificationEmail({
-      recipientTitle: user.title,
-      recipientName: user.lastName,
+      recipientTitle: '',
+      recipientName: senderFullName,
       amountText,
       accountNickname: account.nickname,
       accountLast4: account.accountNumber.slice(-4),

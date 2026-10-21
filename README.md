@@ -81,9 +81,9 @@ Point `MONGODB_URI` at `mongodb://127.0.0.1:27017/northstar_financial` to use it
 
 ## The seeded identity
 
-- **User:** Mr. James Leonard — logs in with the `DEMO_USERNAME` / `DEMO_PASSWORD` set in your
+- **User:** Kevin Lutolf — logs in with the `DEMO_USERNAME` / `DEMO_PASSWORD` set in your
   `.env`; the account's on-file contact email (used for debit/transfer notification emails) is
-  `j.leonard@northstarfinancial.example`
+  `kevin.lutolf@northstarfinancial.example`
 - **Checking — Northstar Premier Checking:** $967,000.00
 - **Savings — Northstar High-Yield Savings:** $1,843,200.75 at 4.25% APY
 - **Debit card:** linked to checking, active, BIN `0000`
@@ -214,7 +214,7 @@ without re-entering the transfer.
 ## Verified end-to-end
 
 - `npm install && npm run setup && npm start` runs clean.
-- Logging in shows "Hello, welcome, Mr. Leonard." with $967,000.00 checking and $1,843,200.75
+- Logging in shows "Hello, welcome, Kevin Lutolf." with $967,000.00 checking and $1,843,200.75
   savings.
 - A full transfer (Details → Review → Confirm → Success) debits MongoDB atomically, the
   transaction appears immediately in Activity, and both the debit-notification and (when
