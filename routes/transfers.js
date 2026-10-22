@@ -210,79 +210,90 @@ router.post('/confirm', transferValidators, pinValidators, handleValidation, asy
     const amountText = formatCents(transfer.amountCents);
     const senderFullName = `${user.firstName} ${user.lastName}`.trim();
 
-    const ownerEmailBody = [
-      `Hello ${senderFullName},`,
-      '',
-      `A transfer of ${amountText} was sent from your ${account.nickname} (account ending ${account.accountNumber.slice(-4)}) to ${transfer.recipientName}.`,
-      `Transfer type: ${transfer.transferType}`,
-      transfer.memo ? `Memo: ${transfer.memo}` : null,
-      `Confirmation code: ${transfer.confirmationCode}`,
-      `New balance: ${formatCents(account.balanceCents)}`,
-      '',
-      'If you did not authorize this transfer, please contact Northstar Financial support immediately.',
-    ].filter(Boolean).join('\n');
-
-    const ownerEmailHtml = buildDebitNotificationEmail({
-      recipientTitle: '',
-      recipientName: senderFullName,
-      amountText,
-      accountNickname: account.nickname,
-      accountLast4: account.accountNumber.slice(-4),
-      toName: transfer.recipientName,
-      transferType: transfer.transferType,
-      memo: transfer.memo,
-      confirmationCode: transfer.confirmationCode,
-      newBalanceText: formatCents(account.balanceCents),
-      whenText,
-    });
-
-    await sendEmail({
-      userId: user._id,
-      toEmail: user.email,
-      subject: 'Northstar Financial — Debit Notification',
-      body: ownerEmailBody,
-      html: ownerEmailHtml,
-      type: 'debit_notification',
-      relatedTransferId: transfer._id,
-    });
-
-    if (transfer.notifyRecipient && transfer.recipientEmail) {
-      const recipientEmailBody = [
-        `Hello ${transfer.recipientName},`,
-        '',
-        `${senderFullName} has sent you a transfer of ${amountText} via Northstar Financial.`,
-        transfer.memo ? `Memo: ${transfer.memo}` : null,
-        `Confirmation code: ${transfer.confirmationCode}`,
-        '',
-        'This is an automated notification from Northstar Financial.',
-      ].filter(Boolean).join('\n');
-
-      const recipientEmailHtml = buildTransferNotificationEmail({
-        recipientName: transfer.recipientName,
-        amountText,
-        senderName: senderFullName,
-        memo: transfer.memo,
-        confirmationCode: transfer.confirmationCode,
-        whenText,
-      });
-
-      await sendEmail({
-        userId: user._id,
-        toEmail: transfer.recipientEmail,
-        subject: 'Northstar Financial — Transfer Notification',
-        body: recipientEmailBody,
-        html: recipientEmailHtml,
-        type: 'transfer_notification',
-        relatedTransferId: transfer._id,
-      });
-    }
-
+    // Respond immediately so the client shows the receipt without waiting for
+    // the (non-critical) notification emails to be generated and stored.
     res.json({
       success: true,
       confirmationCode: transfer.confirmationCode,
       newBalanceCents: account.balanceCents,
       transferId: transfer._id,
     });
+
+    // Notification emails are best-effort: generate + store them in the
+    // background so a slow mailer can never block or fail the transfer.
+    (async () => {
+      try {
+        const ownerEmailBody = [
+          `Hello ${senderFullName},`,
+          '',
+          `A transfer of ${amountText} was sent from your ${account.nickname} (account ending ${account.accountNumber.slice(-4)}) to ${transfer.recipientName}.`,
+          `Transfer type: ${transfer.transferType}`,
+          transfer.memo ? `Memo: ${transfer.memo}` : null,
+          `Confirmation code: ${transfer.confirmationCode}`,
+          `New balance: ${formatCents(account.balanceCents)}`,
+          '',
+          'If you did not authorize this transfer, please contact Northstar Financial support immediately.',
+        ].filter(Boolean).join('\n');
+
+        const ownerEmailHtml = buildDebitNotificationEmail({
+          recipientTitle: '',
+          recipientName: senderFullName,
+          amountText,
+          accountNickname: account.nickname,
+          accountLast4: account.accountNumber.slice(-4),
+          toName: transfer.recipientName,
+          transferType: transfer.transferType,
+          memo: transfer.memo,
+          confirmationCode: transfer.confirmationCode,
+          newBalanceText: formatCents(account.balanceCents),
+          whenText,
+        });
+
+        await sendEmail({
+          userId: user._id,
+          toEmail: user.email,
+          subject: 'Northstar Financial — Debit Notification',
+          body: ownerEmailBody,
+          html: ownerEmailHtml,
+          type: 'debit_notification',
+          relatedTransferId: transfer._id,
+        });
+
+        if (transfer.notifyRecipient && transfer.recipientEmail) {
+          const recipientEmailBody = [
+            `Hello ${transfer.recipientName},`,
+            '',
+            `${senderFullName} has sent you a transfer of ${amountText} via Northstar Financial.`,
+            transfer.memo ? `Memo: ${transfer.memo}` : null,
+            `Confirmation code: ${transfer.confirmationCode}`,
+            '',
+            'This is an automated notification from Northstar Financial.',
+          ].filter(Boolean).join('\n');
+
+          const recipientEmailHtml = buildTransferNotificationEmail({
+            recipientName: transfer.recipientName,
+            amountText,
+            senderName: senderFullName,
+            memo: transfer.memo,
+            confirmationCode: transfer.confirmationCode,
+            whenText,
+          });
+
+          await sendEmail({
+            userId: user._id,
+            toEmail: transfer.recipientEmail,
+            subject: 'Northstar Financial — Transfer Notification',
+            body: recipientEmailBody,
+            html: recipientEmailHtml,
+            type: 'transfer_notification',
+            relatedTransferId: transfer._id,
+          });
+        }
+      } catch (emailErr) {
+        // eslint-disable-next-line no-console
+        console.error('Background email send failed:', emailErr.message);
+      }
+    })();
   } catch (err) {
     res.status(err.statusCode || 500).json({ error: err.statusCode ? err.message : 'Transfer could not be completed. Please try again.' });
   } finally {
