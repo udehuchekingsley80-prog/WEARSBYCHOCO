@@ -610,7 +610,6 @@ tbody tr:hover { background: var(--gray-50); }
 
 .form-checkbox-row { display: flex; align-items: center; gap: 8px; }
 .form-error { color: var(--red-600); font-size: 12.5px; margin-top: 6px; }
-.form-hint { color: var(--ink-500); font-size: 12px; margin-top: 6px; }
 
 .pin-input {
   text-align: center;
@@ -1489,6 +1488,16 @@ html.nav-open { overflow: hidden; }
     animation: none !important;
   }
 }
+
+.form-hint {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  display: none;
+}
+
+.form-hint-ok { color: var(--green-600); display: block; }
+.form-hint-err { color: var(--red-600); display: block; }
 
 /* ---------- Login loader ---------- */
 

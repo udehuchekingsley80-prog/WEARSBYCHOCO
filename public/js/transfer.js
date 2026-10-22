@@ -22,6 +22,42 @@
   const pinSubmit = document.getElementById('pin-submit');
   const pinSubmitLabel = document.getElementById('pin-submit-label');
 
+  const recipientEmailInput = document.getElementById('recipient-email');
+  const recipientEmailHint = document.getElementById('recipient-email-hint');
+  const notifyRecipientCheckbox = document.getElementById('notify-recipient');
+
+  function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(value || '').trim());
+  }
+
+  if (recipientEmailInput) {
+    recipientEmailInput.addEventListener('input', () => {
+      const value = recipientEmailInput.value.trim();
+      if (!value) {
+        if (recipientEmailHint) {
+          recipientEmailHint.style.display = 'none';
+          recipientEmailHint.textContent = '';
+          recipientEmailHint.className = 'form-hint';
+        }
+        return;
+      }
+      if (isValidEmail(value)) {
+        if (recipientEmailHint) {
+          recipientEmailHint.style.display = 'block';
+          recipientEmailHint.textContent = '✓ Valid email — recipient will be notified';
+          recipientEmailHint.className = 'form-hint form-hint-ok';
+        }
+        if (notifyRecipientCheckbox) notifyRecipientCheckbox.checked = true;
+      } else {
+        if (recipientEmailHint) {
+          recipientEmailHint.style.display = 'block';
+          recipientEmailHint.textContent = 'Enter a valid email address';
+          recipientEmailHint.className = 'form-hint form-hint-err';
+        }
+      }
+    });
+  }
+
   let accounts = [];
   let lastFormValues = null;
   let lastReview = null;
