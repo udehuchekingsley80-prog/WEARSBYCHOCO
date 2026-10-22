@@ -95,6 +95,7 @@ function buildSidebar(activeKey, user) {
     </div>` : '';
 
   return `
+    <button class="sidebar-close" id="sidebar-close" type="button" aria-label="Close navigation menu">&times;</button>
     <div class="brand"><span class="brand-mark">N</span><span>Northstar Financial</span></div>
     ${userBlock}
     <nav class="sidebar-nav">
@@ -116,6 +117,35 @@ function buildMobileTabbar(activeKey) {
     const active = item.key === activeKey ? ' active' : '';
     return `<a href="${item.href}" class="${active.trim()}">${ICONS[item.icon]}<span>${item.label}</span></a>`;
   }).join('');
+}
+
+// The compact mobile header carries no static markup for the account holder,
+// so the avatar / name chip is created on demand and filled in once the
+// signed-in user is known.
+function ensureMobileUserChip() {
+  const topbar = document.querySelector('.mobile-topbar');
+  if (!topbar) return null;
+
+  let avatarEl = document.getElementById('mobile-avatar');
+  if (avatarEl) return avatarEl;
+
+  const chip = document.createElement('a');
+  chip.href = 'profile.html';
+  chip.className = 'mobile-user-chip';
+  chip.setAttribute('aria-label', 'Profile and settings');
+
+  avatarEl = document.createElement('span');
+  avatarEl.className = 'avatar';
+  avatarEl.id = 'mobile-avatar';
+  chip.appendChild(avatarEl);
+
+  const nameEl = document.createElement('span');
+  nameEl.className = 'user-chip-name';
+  nameEl.id = 'mobile-user-chip-name';
+  chip.appendChild(nameEl);
+
+  topbar.appendChild(chip);
+  return avatarEl;
 }
 
 const Toast = {
@@ -163,6 +193,12 @@ async function initShell(activeKey, pageTitle) {
 
   const sidebarAvatarEl = document.getElementById('sidebar-avatar');
   applyAvatar(sidebarAvatarEl, user);
+
+  const mobileAvatarEl = ensureMobileUserChip();
+  applyAvatar(mobileAvatarEl, user);
+
+  const mobileUserChipName = document.getElementById('mobile-user-chip-name');
+  if (mobileUserChipName) mobileUserChipName.textContent = fullNameOf(user);
 
   const mobileTabbar = document.getElementById('mobile-tabbar-slot');
   if (mobileTabbar) mobileTabbar.innerHTML = buildMobileTabbar(activeKey);

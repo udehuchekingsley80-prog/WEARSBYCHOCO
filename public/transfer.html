@@ -128,13 +128,28 @@
             </div>
           </div>
 
-          <!-- Step 4: Success -->
+          <!-- Step 4: Success / Receipt -->
           <div class="wizard-panel" id="step-4">
-            <div class="success-icon">&#10003;</div>
-            <h2 style="text-align:center;">Transfer Complete</h2>
-            <p class="text-muted text-sm" style="text-align:center;">Your transfer has been sent successfully.</p>
-            <div class="confirmation-code" id="confirmation-code"></div>
-            <div class="review-summary" id="success-summary"></div>
+            <div class="receipt">
+              <div class="receipt-header">
+                <div class="receipt-check">&#10003;</div>
+                <h2>Transfer Complete</h2>
+                <p class="text-muted text-sm">Your transfer has been sent successfully.</p>
+              </div>
+
+              <div class="receipt-code">
+                <span class="receipt-code-label">Confirmation code</span>
+                <span class="confirmation-code" id="confirmation-code"></span>
+              </div>
+
+              <div class="receipt-body" id="success-summary"></div>
+
+              <div class="receipt-footer">
+                <span class="badge badge-green">Completed</span>
+                <span class="text-sm text-muted" id="receipt-timestamp"></span>
+              </div>
+            </div>
+
             <div class="flex gap-12 mt-16">
               <a href="transactions.html" class="btn btn-secondary btn-block">View Activity</a>
               <a href="dashboard.html" class="btn btn-primary btn-block">Back to Dashboard</a>
@@ -172,6 +187,7 @@
   <script src="js/api.js"></script>
   <script src="js/money.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/mobile-nav.js" defer></script>
   <script src="js/transfer.js"></script>
 </body>
 </html>

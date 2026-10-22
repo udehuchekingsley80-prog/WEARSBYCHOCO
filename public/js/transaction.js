@@ -63,13 +63,13 @@
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
             <div class="text-sm text-muted">${escapeHtml(t.category)}</div>
-            <div style="font-size:19px;font-weight:700;margin-top:4px;">${escapeHtml(t.description)}</div>
+            <div class="tx-title">${escapeHtml(t.description)}</div>
             ${t.merchant ? `<div class="text-sm text-muted" style="margin-top:2px;">${escapeHtml(t.merchant)}</div>` : ''}
           </div>
           <span class="badge badge-${statusBadge}">${escapeHtml(t.status)}</span>
         </div>
 
-        <div class="tabular" style="font-size:36px;font-weight:700;margin-top:22px;color:${amountColorVar};font-family:'IBM Plex Sans',sans-serif;">
+        <div class="tabular tx-amount" style="color:${amountColorVar};">
           ${amountSign}${formatCents(t.amountCents)}
         </div>
 

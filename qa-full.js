@@ -41,7 +41,7 @@ const allErrors = {};
   await page.waitForTimeout(400);
   await page.screenshot({ path: path.join(SHOT_DIR, '01-login.png'), fullPage: true });
 
-  await page.fill('#username', 'udehuchekingsley80@gmail.com');
+  await page.fill('#username', 'kevinlutolf6153635@gmail.com');
   await page.fill('#password', 'ROSEMARY2013@');
   await page.click('#login-submit');
   await page.waitForURL('**/dashboard.html', { timeout: 15000, waitUntil: 'domcontentloaded' });

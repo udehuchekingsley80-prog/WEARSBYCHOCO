@@ -20,8 +20,8 @@
       <div class="card" style="background: linear-gradient(135deg, #3b1f66 0%, #1a0f2e 100%); color:#fff; border:none;">
         <div class="flex justify-between items-center">
           <div>
-            <div style="opacity:0.8; font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px;">Northstar Rewards</div>
-            <div style="font-size:30px; font-weight:700; font-family:'IBM Plex Sans',sans-serif; margin-top:6px;" class="tabular">${rewards.pointsBalance.toLocaleString('en-US')} pts</div>
+            <div class="rewards-eyebrow">Northstar Rewards</div>
+            <div class="rewards-points tabular">${rewards.pointsBalance.toLocaleString('en-US')} pts</div>
           </div>
           <span class="badge badge-amber">${rewards.tier} Tier</span>
         </div>

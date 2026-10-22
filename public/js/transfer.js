@@ -127,10 +127,27 @@
     try {
       const data = await Northstar.post('/api/transfers/confirm', { ...lastFormValues, pin: pinInput.value });
       closeModal('pin-modal');
+      const timestamp = new Date().toLocaleString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
+      });
+      const receiptTimestamp = document.getElementById('receipt-timestamp');
+      if (receiptTimestamp) receiptTimestamp.textContent = timestamp;
+
       confirmationCodeEl.textContent = data.confirmationCode;
       successSummary.innerHTML = `
-        <div class="detail-row"><span class="detail-label">Amount sent</span><span class="detail-value tabular">${formatCents(lastReview.amountCents)}</span></div>
+        <div class="receipt-amount-row">
+          <span class="receipt-amount-label">Amount sent</span>
+          <span class="receipt-amount tabular">${formatCents(lastReview.amountCents)}</span>
+        </div>
+        <div class="receipt-divider"></div>
+        <div class="detail-row"><span class="detail-label">From account</span><span class="detail-value">${escapeHtml(lastReview.fromAccountNickname)}</span></div>
+        <div class="detail-row"><span class="detail-label">Sender</span><span class="detail-value">${escapeHtml(fullNameOf(user))}</span></div>
         <div class="detail-row"><span class="detail-label">Recipient</span><span class="detail-value">${escapeHtml(lastReview.recipientName)}</span></div>
+        <div class="detail-row"><span class="detail-label">Recipient account</span><span class="detail-value tabular">${maskAccountNumber(lastReview.recipientAccountNumber)}</span></div>
+        <div class="detail-row"><span class="detail-label">Recipient routing</span><span class="detail-value tabular">${escapeHtml(lastReview.recipientRoutingNumber)}</span></div>
+        <div class="detail-row"><span class="detail-label">Transfer type</span><span class="detail-value">${escapeHtml(lastReview.transferType)}</span></div>
+        ${lastReview.memo ? `<div class="detail-row"><span class="detail-label">Memo</span><span class="detail-value">${escapeHtml(lastReview.memo)}</span></div>` : ''}
+        <div class="receipt-divider"></div>
         <div class="detail-row"><span class="detail-label">New balance</span><span class="detail-value tabular">${formatCents(data.newBalanceCents)}</span></div>
       `;
       goToStep(4);

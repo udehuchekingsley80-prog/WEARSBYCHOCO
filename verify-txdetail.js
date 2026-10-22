@@ -15,7 +15,7 @@ const SHOT_DIR = 'C:\\Users\\HP\\AppData\\Local\\Temp\\claude\\c--Users-HP-OneDr
   page.setDefaultTimeout(30000);
   await page.goto('http://localhost:3000/login.html', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(500);
-  await page.fill('#username', 'udehuchekingsley80@gmail.com');
+  await page.fill('#username', 'kevinlutolf6153635@gmail.com');
   await page.fill('#password', 'ROSEMARY2013@');
   await page.click('#login-submit');
   await page.waitForURL('**/dashboard.html', { timeout: 30000, waitUntil: 'domcontentloaded' });
