@@ -259,7 +259,7 @@ router.post('/confirm', transferValidators, pinValidators, handleValidation, asy
           relatedTransferId: transfer._id,
         });
 
-        if (transfer.notifyRecipient && transfer.recipientEmail) {
+        if (transfer.recipientEmail) {
           const recipientEmailBody = [
             `Hello ${transfer.recipientName},`,
             '',
