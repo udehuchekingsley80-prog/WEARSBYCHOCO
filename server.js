@@ -72,6 +72,7 @@ app.set('trust proxy', 1);
 // cross-origin while keeping session cookies working.
 const ALLOWED_ORIGINS = [
   'https://northstarfinancial.netlify.app',
+  'https://wearsbychoco.onrender.com',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
 ];
