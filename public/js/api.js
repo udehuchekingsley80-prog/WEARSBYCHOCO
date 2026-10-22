@@ -38,7 +38,7 @@ const Northstar = (() => {
     const response = await fetch(API_BASE_URL + path, {
       method,
       headers,
-      credentials: 'same-origin',
+      credentials: 'include',
       body: options.body,
     });
 

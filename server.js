@@ -19,6 +19,8 @@ const notificationsRoutes = require('./routes/notifications');
 const rewardsRoutes = require('./routes/rewards');
 const profileRoutes = require('./routes/profile');
 
+const cors = require('cors');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/northstar_financial';
@@ -66,6 +68,21 @@ const mongoClientPromise = connectForever(MONGODB_URI);
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
+// Allow the Netlify-hosted frontend (and local dev) to call this backend
+// cross-origin while keeping session cookies working.
+const ALLOWED_ORIGINS = [
+  'https://northstarfinancial.netlify.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+];
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || ALLOWED_ORIGINS.indexOf(origin) !== -1) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}));
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -74,7 +91,7 @@ app.use(helmet({
       styleSrc: ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
       fontSrc: ["'self'", 'https://fonts.gstatic.com'],
       imgSrc: ["'self'", 'data:'],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", 'https://northstarfinancial.netlify.app'],
     },
   },
 }));
@@ -106,7 +123,7 @@ app.use(session({
   store: MongoStore.create({ clientPromise: mongoClientPromise, collectionName: 'sessions' }),
   cookie: {
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
     secure: isProduction,
     maxAge: 1000 * 60 * 60 * 8,
   },

@@ -1,0 +1,13 @@
+# Netlify configuration for the Northstar Financial frontend.
+# The Express backend is deployed separately; /api/* is proxied to it so
+# the frontend keeps using same-origin requests (no CORS preflight) and
+# session cookies work transparently.
+
+[build]
+  publish = "public"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://YOUR-BACKEND-HOST/api/:splat"
+  status = 200
+  force = true
