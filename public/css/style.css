@@ -1490,6 +1490,68 @@ html.nav-open { overflow: hidden; }
   }
 }
 
+/* ---------- Login loader ---------- */
+
+.login-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, var(--navy-900) 0%, var(--navy-950) 100%);
+  color: #fff;
+}
+
+.login-loader-inner { text-align: center; }
+
+.login-loader-mark {
+  width: 72px;
+  height: 72px;
+  font-size: 30px;
+  margin: 0 auto 24px;
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.06);
+}
+
+.login-loader-count {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 52px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+}
+
+.login-loader-bar {
+  width: 220px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  margin: 0 auto 22px;
+  overflow: hidden;
+}
+
+.login-loader-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--blue-400), var(--blue-500));
+  border-radius: 999px;
+  transition: width 0.08s linear;
+}
+
+.login-loader-greeting {
+  font-size: 18px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.login-loader-greeting.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* ---------- Misc utility ---------- */
 
 .flex { display: flex; }
