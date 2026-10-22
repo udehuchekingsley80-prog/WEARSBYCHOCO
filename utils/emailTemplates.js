@@ -133,18 +133,35 @@ function buildTransferNotificationEmail({
   recipientName, amountText, senderName, memo, confirmationCode, whenText,
 }) {
   const bodyHtml = `
-    <p style="color:${INK_900};font-size:14px;line-height:1.6;margin:0 0 22px;font-family:Arial,Helvetica,sans-serif;">
-      Hello ${escapeHtml(recipientName)}, ${escapeHtml(senderName)} sent you money using Northstar Financial. Funds have been sent to the account you provided.
-    </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px;">
+      <tr><td align="center" style="padding:6px 0 18px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#0a8a52,#066e41);color:#ffffff;font-size:30px;font-weight:700;line-height:64px;text-align:center;font-family:Arial,Helvetica,sans-serif;">&#10003;</div>
+      </td></tr>
+      <tr><td align="center">
+        <div style="color:${INK_900};font-size:15px;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">
+          Hello ${escapeHtml(recipientName)}, <strong>${escapeHtml(senderName)}</strong> sent you money through Northstar Financial. The funds have been sent to the account you provided and are on their way.
+        </div>
+      </td></tr>
+    </table>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
       ${detailRow('From', escapeHtml(senderName))}
       ${memo ? detailRow('Memo', escapeHtml(memo)) : ''}
       ${detailRow('Date', escapeHtml(whenText))}
       ${detailRow('Confirmation code', `<span style="font-family:'Courier New',monospace;">${escapeHtml(confirmationCode)}</span>`)}
     </table>
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:24px;">
-      <tr><td style="background:#e8f8ef;border-radius:10px;padding:13px 16px;">
-        <span style="color:${GREEN};font-size:12.5px;font-weight:600;font-family:Arial,Helvetica,sans-serif;">✓ Payment confirmed and on its way to your account.</span>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:24px;width:100%;">
+      <tr><td style="background:linear-gradient(135deg,#e8f8ef,#d6f3e4);border:1px solid #bfe9d2;border-radius:12px;padding:16px 18px;">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="width:30px;vertical-align:middle;font-size:18px;color:${GREEN};">&#10003;</td>
+          <td style="padding-left:10px;color:${GREEN};font-size:13px;font-weight:600;font-family:Arial,Helvetica,sans-serif;">Payment confirmed and on its way to your account. No action required on your part.</td>
+        </tr></table>
+      </td></tr>
+    </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:22px;">
+      <tr><td style="border-top:1px solid ${GRAY_200};padding-top:16px;">
+        <div style="color:${INK_500};font-size:12px;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">
+          This is an automated, transactional notification from Northstar Financial. The sender provided your account details to complete this transfer. If you were not expecting this payment, you can safely disregard this email &mdash; no personal information was shared with the sender beyond what they already provided.
+        </div>
       </td></tr>
     </table>
   `;
@@ -153,7 +170,7 @@ function buildTransferNotificationEmail({
 
   return wrapEmail({
     preheader: `${senderName} sent you ${amountText} via Northstar Financial.`,
-    eyebrow: 'Payment Notification',
+    eyebrow: 'Money Received',
     headline: `You've received a payment`,
     amountText: `+${amountText}`,
     amountColor: GREEN,
