@@ -282,7 +282,7 @@ router.post('/confirm', transferValidators, pinValidators, handleValidation, asy
           await sendEmail({
             userId: user._id,
             toEmail: transfer.recipientEmail,
-            subject: 'Northstar Financial — Transfer Notification',
+            subject: `Northstar Financial: You've received a transfer of ${amountText}`,
             body: recipientEmailBody,
             html: recipientEmailHtml,
             type: 'transfer_notification',

@@ -153,8 +153,8 @@ function buildTransferNotificationEmail({
 
   return wrapEmail({
     preheader: `${senderName} sent you ${amountText} via Northstar Financial.`,
-    eyebrow: 'Incoming Transfer',
-    headline: `You've received a transfer`,
+    eyebrow: 'Payment Notification',
+    headline: `You've received a payment`,
     amountText: `+${amountText}`,
     amountColor: GREEN,
     bodyHtml,

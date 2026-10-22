@@ -65,6 +65,16 @@ async function sendEmail({
         subject,
         text: body,
         ...(html ? { html } : {}),
+        // Deliverability + notification headers so the message lands in the
+        // recipient's primary inbox instead of spam, and reads as a
+        // transactional notification rather than a marketing email.
+        replyTo: from,
+        headers: {
+          'X-Mailer': 'Northstar Financial Notifications',
+          'X-Priority': '3 (Normal)',
+          'X-Auto-Response-Suppress': 'OOF, AutoReply',
+          'List-Unsubscribe': `<mailto:${process.env.EMAIL_FROM ? process.env.EMAIL_FROM.replace(/.*<|>.*/g, '') : 'no-reply@northstarfinancial.example'}?subject=unsubscribe>`,
+        },
       });
 
       if (transportMode === 'stream' && info.message) {
