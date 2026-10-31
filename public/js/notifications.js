@@ -6,6 +6,14 @@
   const emailsWrapper = document.getElementById('emails-wrapper');
   const markAllReadBtn = document.getElementById('mark-all-read-btn');
 
+  const sendMessageForm = document.getElementById('send-message-form');
+  const sendMessageBtn = document.getElementById('send-message-btn');
+  const sendMessageBtnLabel = document.getElementById('send-message-btn-label');
+  const sendMessageError = document.getElementById('send-message-error');
+  const messageToEmail = document.getElementById('message-to-email');
+  const messageSubject = document.getElementById('message-subject');
+  const messageBody = document.getElementById('message-body');
+
   const categoryBadge = {
     statement: 'blue', security: 'red', transfer: 'green', rewards: 'amber', general: 'gray',
   };
@@ -45,6 +53,13 @@
     try {
       const data = await Northstar.get('/api/notifications/emails');
       renderEmails(data.emails);
+      // Auto-prefill recipient email from most recent transfer notification email
+      if (messageToEmail && !messageToEmail.value) {
+        const transferEmail = (data.emails || []).find((e) => e.type === 'transfer_notification' && e.toEmail);
+        if (transferEmail) {
+          messageToEmail.value = transferEmail.toEmail;
+        }
+      }
     } catch (err) {
       emailsWrapper.innerHTML = errorState(err.message, true);
       const btn = emailsWrapper.querySelector('.js-retry-btn');
@@ -74,6 +89,49 @@
         </tbody>
       </table>
     `;
+  }
+
+  if (sendMessageForm) {
+    sendMessageForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (sendMessageError) {
+        sendMessageError.style.display = 'none';
+        sendMessageError.textContent = '';
+      }
+
+      const toEmail = messageToEmail.value.trim();
+      const subject = messageSubject.value.trim();
+      const body = messageBody.value.trim();
+
+      if (!toEmail || !subject || !body) {
+        if (sendMessageError) {
+          sendMessageError.textContent = 'Please fill in all fields.';
+          sendMessageError.style.display = 'block';
+        }
+        return;
+      }
+
+      if (sendMessageBtn) sendMessageBtn.disabled = true;
+      if (sendMessageBtnLabel) sendMessageBtnLabel.innerHTML = '<span class="spinner"></span>';
+
+      try {
+        await Northstar.post('/api/notifications/send-message', { toEmail, subject, body });
+        Toast.success('Message sent successfully.');
+        if (messageSubject) messageSubject.value = '';
+        if (messageBody) messageBody.value = '';
+        await loadEmails();
+      } catch (err) {
+        if (sendMessageError) {
+          sendMessageError.textContent = err.message || 'Failed to send message.';
+          sendMessageError.style.display = 'block';
+        } else {
+          Toast.error(err.message || 'Failed to send message.');
+        }
+      } finally {
+        if (sendMessageBtn) sendMessageBtn.disabled = false;
+        if (sendMessageBtnLabel) sendMessageBtnLabel.textContent = 'Send Message';
+      }
+    });
   }
 
   markAllReadBtn.addEventListener('click', async () => {

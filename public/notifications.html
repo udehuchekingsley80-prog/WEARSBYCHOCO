@@ -39,6 +39,34 @@
 
       <main class="content">
         <div class="section-header">
+          <h2>Send Message</h2>
+        </div>
+        <div class="card mb-16">
+          <form id="send-message-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="message-to-email">Recipient Email</label>
+                <input class="form-input" type="email" id="message-to-email" name="toEmail" placeholder="recipient@example.com" autocomplete="email" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="message-subject">Subject</label>
+                <input class="form-input" type="text" id="message-subject" name="subject" placeholder="Message subject" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="message-body">Message</label>
+              <textarea class="form-textarea" id="message-body" name="body" rows="6" placeholder="Type your message here..." required></textarea>
+            </div>
+            <div class="flex gap-8">
+              <button class="btn btn-primary" type="submit" id="send-message-btn">
+                <span id="send-message-btn-label">Send Message</span>
+              </button>
+            </div>
+            <div class="form-error" id="send-message-error" style="display:none; margin-top:10px;"></div>
+          </form>
+        </div>
+
+        <div class="section-header">
           <h2>In-App Notifications</h2>
           <button class="btn btn-outline btn-sm" id="mark-all-read-btn" type="button">Mark all read</button>
         </div>
