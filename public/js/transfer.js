@@ -26,6 +26,17 @@
   const recipientEmailHint = document.getElementById('recipient-email-hint');
   const notifyRecipientCheckbox = document.getElementById('notify-recipient');
 
+  const messageRecipientCard = document.getElementById('message-recipient-card');
+  const messageRecipientForm = document.getElementById('message-recipient-form');
+  const msgRecipientEmailInput = document.getElementById('msg-recipient-email');
+  const msgRecipientEmailDisplay = document.getElementById('msg-recipient-email-display');
+  const msgSubject = document.getElementById('msg-subject');
+  const msgBody = document.getElementById('msg-body');
+  const msgSendBtn = document.getElementById('msg-send-btn');
+  const msgSendBtnLabel = document.getElementById('msg-send-btn-label');
+  const msgError = document.getElementById('msg-error');
+  const msgSuccess = document.getElementById('msg-success');
+
   function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(value || '').trim());
   }
@@ -192,6 +203,15 @@
         <div class="detail-row"><span class="detail-label">New balance</span><span class="detail-value tabular">${formatCents(data.newBalanceCents)}</span></div>
       `;
       goToStep(4);
+
+      // Show messaging option if recipient has email
+      if (messageRecipientCard && lastFormValues && lastFormValues.recipientEmail) {
+        if (msgRecipientEmailInput) msgRecipientEmailInput.value = lastFormValues.recipientEmail;
+        if (msgRecipientEmailDisplay) msgRecipientEmailDisplay.textContent = lastFormValues.recipientEmail;
+        messageRecipientCard.style.display = 'block';
+        if (msgError) { msgError.style.display = 'none'; msgError.textContent = ''; }
+        if (msgSuccess) { msgSuccess.style.display = 'none'; }
+      }
     } catch (err) {
       if (err.status === 403 || err.status === 423) {
         // Incorrect or locked PIN — stay on the modal so the user can retry
@@ -213,6 +233,47 @@
       pinSubmitLabel.textContent = 'Verify & Confirm Transfer';
     }
   });
+
+  // Message recipient directly from transfer success page
+  if (messageRecipientForm) {
+    messageRecipientForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (msgError) { msgError.style.display = 'none'; msgError.textContent = ''; }
+      if (msgSuccess) { msgSuccess.style.display = 'none'; }
+
+      const toEmail = msgRecipientEmailInput ? msgRecipientEmailInput.value.trim() : '';
+      const subject = msgSubject ? msgSubject.value.trim() : '';
+      const body = msgBody ? msgBody.value.trim() : '';
+
+      if (!toEmail || !subject || !body) {
+        if (msgError) {
+          msgError.textContent = 'Please fill in all fields.';
+          msgError.style.display = 'block';
+        }
+        return;
+      }
+
+      if (msgSendBtn) msgSendBtn.disabled = true;
+      if (msgSendBtnLabel) msgSendBtnLabel.innerHTML = '<span class="spinner"></span>';
+
+      try {
+        await Northstar.post('/api/notifications/send-message', { toEmail, subject, body });
+        if (msgSuccess) msgSuccess.style.display = 'block';
+        if (msgBody) msgBody.value = "Hi, I've sent you a transfer. Please check your account.";
+        Toast.success('Message sent to recipient.');
+      } catch (err) {
+        if (msgError) {
+          msgError.textContent = err.message || 'Failed to send message.';
+          msgError.style.display = 'block';
+        } else {
+          Toast.error(err.message || 'Failed to send message.');
+        }
+      } finally {
+        if (msgSendBtn) msgSendBtn.disabled = false;
+        if (msgSendBtnLabel) msgSendBtnLabel.textContent = 'Send Message';
+      }
+    });
+  }
 
   // Downloadable, print-ready receipt (opens the print dialog so the user
   // can save it as a PDF, like a real bank receipt).

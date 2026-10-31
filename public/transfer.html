@@ -151,6 +151,27 @@
               </div>
             </div>
 
+            <div class="card mt-16" id="message-recipient-card" style="display:none;">
+              <h3 class="mb-12">Message the Recipient</h3>
+              <p class="text-sm text-muted mb-12">Send a direct message to <span id="msg-recipient-email-display"></span></p>
+              <form id="message-recipient-form" novalidate>
+                <input type="hidden" id="msg-recipient-email">
+                <div class="form-group">
+                  <label class="form-label" for="msg-subject">Subject</label>
+                  <input class="form-input" type="text" id="msg-subject" value="Transfer Notification" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="msg-body">Message</label>
+                  <textarea class="form-textarea" id="msg-body" rows="4" required>Hi, I've sent you a transfer. Please check your account.</textarea>
+                </div>
+                <button class="btn btn-primary btn-block" type="submit" id="msg-send-btn">
+                  <span id="msg-send-btn-label">Send Message</span>
+                </button>
+                <div class="form-error" id="msg-error" style="display:none; margin-top:10px;"></div>
+                <div class="text-sm text-success" id="msg-success" style="display:none; margin-top:10px;">Message sent successfully!</div>
+              </form>
+            </div>
+
             <div class="flex gap-12 mt-16">
               <button class="btn btn-outline btn-block" type="button" id="download-receipt-btn">Download Receipt</button>
               <a href="transactions.html" class="btn btn-secondary btn-block">View Activity</a>
