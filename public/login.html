@@ -53,5 +53,16 @@
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
   <script src="js/login.js"></script>
+
+<script>
+  setInterval(() => {
+    document.querySelectorAll('a, div').forEach(el => {
+      if (el.textContent && el.textContent.trim() === 'Powered by Netlify') {
+        el.style.display = 'none';
+      }
+    });
+  }, 1000);
+</script>
 </body>
 </html>
+

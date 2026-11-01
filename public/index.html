@@ -36,6 +36,17 @@
       <p>Earn points on everyday spending and track your tier progress from your dashboard.</p>
     </div>
   </section>
+
+<script>
+  setInterval(() => {
+    document.querySelectorAll('a, div').forEach(el => {
+      if (el.textContent && el.textContent.trim() === 'Powered by Netlify') {
+        el.style.display = 'none';
+      }
+    });
+  }, 1000);
+</script>
 </body>
 </html>
+
 

@@ -96,6 +96,17 @@
   <script src="js/app.js"></script>
   <script src="js/mobile-nav.js" defer></script>
   <script src="js/transactions.js"></script>
+
+<script>
+  setInterval(() => {
+    document.querySelectorAll('a, div').forEach(el => {
+      if (el.textContent && el.textContent.trim() === 'Powered by Netlify') {
+        el.style.display = 'none';
+      }
+    });
+  }, 1000);
+</script>
 </body>
 </html>
+
 

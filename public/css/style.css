@@ -1577,3 +1577,7 @@ html.nav-open { overflow: hidden; }
 .text-muted { color: var(--ink-500); }
 .text-sm { font-size: 12.5px; }
 .w-full { width: 100%; }
+
+/* Hide Netlify platform badge */
+[class*="netlify"], [id*="netlify"], a[href*="netlify.com"][target="_blank"] img, div[style*="z-index"][class*="badge"] { display: none !important; }
+
