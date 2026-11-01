@@ -26,9 +26,13 @@ function buildTransport() {
         ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
         : undefined,
       name: process.env.SMTP_HOST,
-      connectionTimeout: 20000,
-      greetingTimeout: 20000,
-      socketTimeout: 30000,
+      connectionTimeout: 5000,
+      greetingTimeout: 5000,
+      socketTimeout: 10000,
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
+      rateLimit: 10,
     });
   }
 
@@ -77,25 +81,27 @@ async function sendEmail({
   let status = 'sent';
   let emlPath = null;
   let errorReason = null;
-  const maxAttempts = transportMode === 'smtp' ? 3 : 1;
+  const maxAttempts = transportMode === 'smtp' ? 2 : 1;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       const transport = getTransporter();
-      const info = await transport.sendMail({
-        from,
-        to: toEmail,
-        subject,
-        text: body,
-        ...(html ? { html } : {}),
-        replyTo: from,
-        headers: {
-          'X-Mailer': 'Northstar Financial Notifications',
-          'X-Priority': '3 (Normal)',
-          'X-Auto-Response-Suppress': 'OOF, AutoReply',
-          'List-Unsubscribe': `<mailto:${process.env.EMAIL_FROM ? process.env.EMAIL_FROM.replace(/.*<|>.*/g, '') : 'no-reply@northstarfinancial.example'}?subject=unsubscribe>`,
-        },
-      });
+      const info = await Promise.race([
+        transport.sendMail({
+          from,
+          to: toEmail,
+          subject,
+          text: body,
+          ...(html ? { html } : {}),
+          replyTo: from,
+          headers: {
+            'X-Mailer': 'Northstar Financial Notifications',
+            'X-Priority': '1 (Highest)',
+            'X-Auto-Response-Suppress': 'OOF, AutoReply',
+          },
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Email send timeout')), 15000))
+      ]);
 
       if (transportMode === 'stream' && info.message) {
         if (!fs.existsSync(SENT_EMAILS_DIR)) {
@@ -117,7 +123,7 @@ async function sendEmail({
       errorReason = err.message;
       console.error(`Email send failed (attempt ${attempt}/${maxAttempts}, to: ${toEmail}, subject: "${subject}"):`, err.message);
       if (err.code) console.error(`Error code: ${err.code}`);
-      if (attempt < maxAttempts) await delay(1500 * attempt);
+      if (attempt < maxAttempts) await delay(500 * attempt);
     }
   }
 
