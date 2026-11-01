@@ -2,14 +2,14 @@
 // division — only Math.trunc/% on the integer cents value.
 function formatCents(cents) {
   const value = Number(cents);
-  if (!Number.isFinite(value)) return '$0.00';
+  if (!Number.isFinite(value)) return '€0.00';
   const negative = value < 0;
   const absCents = Math.trunc(Math.abs(value));
   const dollars = Math.trunc(absCents / 100);
   const remainder = absCents % 100;
   const dollarsStr = dollars.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   const centsStr = remainder < 10 ? `0${remainder}` : `${remainder}`;
-  return `${negative ? '-' : ''}$${dollarsStr}.${centsStr}`;
+  return `${negative ? '-' : ''}€${dollarsStr}.${centsStr}`;
 }
 
 function maskAccountNumber(number) {

@@ -2,7 +2,7 @@
 // integer number of cents. Never use parseFloat or float division on money.
 
 /**
- * Turns a human dollar string like "967,000.00", "$1,234", or "12.5" into an
+ * Turns a human dollar string like "967,000.00", "€1,234", or "12.5" into an
  * integer number of cents. Uses only regex + parseInt — never parseFloat.
  * Throws if the input is not a valid dollar amount.
  */
@@ -13,7 +13,7 @@ function parseDollarsToCents(input) {
   }
   if (typeof input !== 'string') throw new Error('Invalid amount');
 
-  const cleaned = input.trim().replace(/^\$/, '').replace(/,/g, '');
+  const cleaned = input.trim().replace(/^\$/, '').replace(/^€/, '').replace(/,/g, '');
   const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(cleaned);
   if (!match) throw new Error('Invalid amount');
 
@@ -33,7 +33,7 @@ function parseDollarsToCents(input) {
 
 /**
  * Turns an integer number of cents into a formatted dollar string like
- * "$967,000.00". Uses Math.trunc/% only — never float division.
+ * "€967,000.00". Uses Math.trunc/% only — never float division.
  */
 function formatCents(cents) {
   if (typeof cents !== 'number' || !Number.isFinite(cents)) {
@@ -47,7 +47,7 @@ function formatCents(cents) {
   const dollarsStr = dollars.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   const centsStr = remainder < 10 ? `0${remainder}` : `${remainder}`;
 
-  return `${negative ? '-' : ''}$${dollarsStr}.${centsStr}`;
+  return `${negative ? '-' : ''}€${dollarsStr}.${centsStr}`;
 }
 
 module.exports = { parseDollarsToCents, formatCents };
