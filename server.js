@@ -71,6 +71,7 @@ app.set('trust proxy', 1);
 // Allow the Netlify-hosted frontend (and local dev) to call this backend
 // cross-origin while keeping session cookies working.
 const ALLOWED_ORIGINS = [
+  'https://northstar-financial-bank.netlify.app',
   'https://northstarfinancial.netlify.app',
   'https://northstar-financial.onrender.com',
   'http://localhost:3000',
@@ -124,8 +125,8 @@ app.use(session({
   store: MongoStore.create({ clientPromise: mongoClientPromise, collectionName: 'sessions' }),
   cookie: {
     httpOnly: true,
-    sameSite: isProduction ? 'none' : 'lax',
-    secure: isProduction,
+    sameSite: 'none',
+    secure: true,
     maxAge: 1000 * 60 * 60 * 8,
   },
 }));

@@ -85,7 +85,8 @@ router.post(
         });
       });
     } catch (err) {
-      res.status(500).json({ error: 'An unexpected error occurred. Please try again.' });
+      console.error('Login error:', err);
+      res.status(500).json({ error: 'An unexpected server error occurred.' });
     }
   },
 );
