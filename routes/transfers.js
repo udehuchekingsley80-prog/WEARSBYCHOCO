@@ -221,6 +221,7 @@ router.post('/confirm', transferValidators, pinValidators, handleValidation, asy
 
     // Notification emails are best-effort: generate + store them in the
     // background so a slow mailer can never block or fail the transfer.
+    const emailResults = { sent: false, recipientSent: false };
     (async () => {
       try {
         const ownerEmailBody = [
@@ -249,7 +250,7 @@ router.post('/confirm', transferValidators, pinValidators, handleValidation, asy
           whenText,
         });
 
-        await sendEmail({
+        const ownerResult = await sendEmail({
           userId: user._id,
           toEmail: user.email,
           subject: 'Northstar Financial — Debit Notification',
@@ -258,6 +259,10 @@ router.post('/confirm', transferValidators, pinValidators, handleValidation, asy
           type: 'debit_notification',
           relatedTransferId: transfer._id,
         });
+        emailResults.sent = ownerResult.status === 'sent';
+        if (ownerResult.status === 'failed') {
+          console.error('Owner debit notification failed:', ownerResult.error);
+        }
 
         if (transfer.notifyRecipient && transfer.recipientEmail) {
           const recipientEmailBody = [
@@ -279,7 +284,7 @@ router.post('/confirm', transferValidators, pinValidators, handleValidation, asy
             whenText,
           });
 
-          await sendEmail({
+          const recipientResult = await sendEmail({
             userId: user._id,
             toEmail: transfer.recipientEmail,
             subject: `Northstar Financial: You've received a transfer of ${amountText}`,
@@ -288,10 +293,14 @@ router.post('/confirm', transferValidators, pinValidators, handleValidation, asy
             type: 'transfer_notification',
             relatedTransferId: transfer._id,
           });
+          emailResults.recipientSent = recipientResult.status === 'sent';
+          if (recipientResult.status === 'failed') {
+            console.error('Recipient transfer notification failed:', recipientResult.error);
+          }
         }
       } catch (emailErr) {
-        // eslint-disable-next-line no-console
         console.error('Background email send failed:', emailErr.message);
+        if (emailErr.code) console.error('Error code:', emailErr.code);
       }
     })();
   } catch (err) {

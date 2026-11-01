@@ -143,6 +143,26 @@ app.use('/api/notifications', notificationsRoutes);
 app.use('/api/rewards', rewardsRoutes);
 app.use('/api/profile', profileRoutes);
 
+// Test email route - remove after testing
+const { sendEmail, verifyTransport } = require('./utils/mailer');
+const { requireAuth } = require('./middleware/auth');
+app.get('/api/test-email', requireAuth, async (req, res) => {
+  try {
+    const testEmail = process.env.TEST_EMAIL_TO || req.session.userId ? (await require('../models').User.findById(req.session.userId)).email : process.env.SMTP_USER;
+    const result = await sendEmail({
+      userId: req.session.userId,
+      toEmail: testEmail,
+      subject: 'Northstar Financial - SMTP Test',
+      body: 'This is a test email from Northstar Financial to verify SMTP configuration.',
+      html: '<p>This is a test email from Northstar Financial to verify SMTP configuration.</p>',
+      type: 'test',
+    });
+    res.json({ success: result.status === 'sent', result });
+  } catch (err) {
+    res.status(500).json({ error: err.message, code: err.code });
+  }
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -169,6 +189,11 @@ process.on('unhandledRejection', (reason) => {
 });
 process.on('uncaughtException', (err) => {
   console.error('Uncaught exception (server kept running):', err);
+});
+
+// Verify SMTP transport on startup
+verifyTransport().catch(err => {
+  console.error('SMTP verification error:', err.message);
 });
 
 // Render (and most hosts) need the server on 0.0.0.0 so it's reachable
