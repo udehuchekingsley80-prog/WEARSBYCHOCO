@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="js/origin-guard.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account — Northstar Financial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-visual">
+      <h1>Join Northstar Financial</h1>
+      <p>Open your account in minutes. No monthly fees, no minimum balance, and high-yield savings from day one.</p>
+      <ul class="auth-benefits">
+        <li>High-yield checking & savings</li>
+        <li>Instant virtual debit card</li>
+        <li>Free domestic transfers</li>
+        <li>Rewards on every purchase</li>
+        <li>Bank-grade security</li>
+      </ul>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-form-box">
+        <div class="brand"><span class="brand-mark">N</span><span>Northstar Financial</span></div>
+        <h2>Create your account</h2>
+        <div class="auth-subtitle">Enter your details to get started</div>
+
+        <div class="auth-error-box" id="register-error"></div>
+
+        <form id="register-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="firstName">First name</label>
+              <input class="form-input" type="text" id="firstName" name="firstName" autocomplete="given-name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="lastName">Last name</label>
+              <input class="form-input" type="text" id="lastName" name="lastName" autocomplete="family-name" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email address</label>
+            <input class="form-input" type="email" id="email" name="email" autocomplete="email" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone number</label>
+            <input class="form-input" type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+1 (555) 000-0000" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-input" type="password" id="password" name="password" autocomplete="new-password" required minlength="8">
+            <div class="form-hint" id="password-hint" style="display:none;"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirmPassword">Confirm password</label>
+            <input class="form-input" type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" required>
+          </div>
+
+          <div class="form-checkbox-row form-group">
+            <input type="checkbox" id="terms" name="terms" required>
+            <label for="terms" class="text-sm">I agree to the <a href="#" class="link">Terms of Service</a> and <a href="#" class="link">Privacy Policy</a></label>
+          </div>
+
+          <div class="form-checkbox-row form-group">
+            <input type="checkbox" id="marketing" name="marketing">
+            <label for="marketing" class="text-sm">Keep me updated on products and offers (optional)</label>
+          </div>
+
+          <button class="btn btn-primary btn-block" type="submit" id="register-submit">
+            <span id="register-submit-label">Create account</span>
+          </button>
+        </form>
+
+        <p class="auth-footer">Already have an account? <a href="login.html" class="link">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/register.js"></script>
+<script>
+  setInterval(() => {
+    document.querySelectorAll('a, div').forEach(el => {
+      if (el.textContent && el.textContent.trim() === 'Powered by Netlify') {
+        el.style.display = 'none';
+      }
+    });
+  }, 1000);
+</script>
+</body>
+</html>

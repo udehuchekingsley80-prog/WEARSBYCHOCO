@@ -99,6 +99,67 @@ router.post('/logout', requireAuth, (req, res) => {
   });
 });
 
+const registerValidators = [
+  body('firstName').trim().notEmpty().withMessage('First name is required.'),
+  body('lastName').trim().notEmpty().withMessage('Last name is required.'),
+  body('email').isEmail().withMessage('Please enter a valid email address.'),
+  body('phone').trim().notEmpty().withMessage('Phone number is required.'),
+  body('password')
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters.')
+    .matches(/[A-Z]/).withMessage('Password must contain an uppercase letter.')
+    .matches(/[a-z]/).withMessage('Password must contain a lowercase letter.')
+    .matches(/[0-9]/).withMessage('Password must contain a number.')
+    .matches(/[^A-Za-z0-9]/).withMessage('Password must contain a special character.'),
+];
+
+router.post('/register', registerValidators, handleValidation, async (req, res) => {
+  try {
+    const { firstName, lastName, email, phone, password, marketing } = req.body;
+
+    const existing = await User.findOne({ username: email.toLowerCase() });
+    if (existing) {
+      return res.status(409).json({ error: 'An account with this email already exists.' });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    const user = await User.create({
+      username: email.toLowerCase(),
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.toLowerCase(),
+      phone: phone.trim(),
+      passwordHash,
+      marketingOptIn: !!marketing,
+      pinHash: await bcrypt.hash('0000', 12), // Default PIN, user can change later
+      title: 'Customer',
+    });
+
+    req.session.regenerate((err) => {
+      if (err) return res.status(500).json({ error: 'Could not start session.' });
+
+      req.session.userId = user._id.toString();
+      const csrfToken = issueCsrfToken(req);
+
+      req.session.save((saveErr) => {
+        if (saveErr) return res.status(500).json({ error: 'Could not start session.' });
+        res.json({
+          success: true,
+          csrfToken,
+          user: {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            title: user.title,
+          },
+        });
+      });
+    });
+  } catch (err) {
+    console.error('Registration error:', err);
+    res.status(500).json({ error: 'An unexpected server error occurred.' });
+  }
+});
+
 router.get('/me', requireAuth, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId).select('username title firstName lastName email phone lastLoginAt');
