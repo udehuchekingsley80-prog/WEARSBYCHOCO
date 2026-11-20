@@ -5,6 +5,7 @@
 
 [build]
   publish = "public"
+  command = "echo 'Static site - no build step required'"
 
 [[redirects]]
   from = "/api/*"
