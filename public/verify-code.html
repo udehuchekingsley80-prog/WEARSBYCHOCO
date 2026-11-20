@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="js/origin-guard.js"></script><script src="js/locale.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Code — Northstar Financial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-visual">
+      <h1>Verify your identity</h1>
+      <p>We've sent a 6-digit code to <strong id="code-email-display"></strong>. Enter it below to continue.</p>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-form-box">
+        <div class="brand"><span class="brand-mark">N</span><span>Northstar Financial</span></div>
+        <h2>Enter verification code</h2>
+        <div class="auth-subtitle">Check your email for the code.</div>
+
+        <div class="auth-error-box" id="verify-error"></div>
+
+        <form id="verify-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="code">6-digit code</label>
+            <input class="form-input pin-input" type="text" id="code" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required>
+          </div>
+
+          <button class="btn btn-primary btn-block" type="submit" id="verify-submit">
+            <span id="verify-submit-label">Verify code</span>
+          </button>
+        </form>
+
+        <div class="auth-help" style="margin-top: 20px;">
+          <p class="text-sm text-muted">Didn't receive the code?</p>
+          <button type="button" id="resend-btn" class="btn btn-outline btn-sm" style="width: auto; margin-top: 8px;">
+            <span id="resend-label">Resend code</span>
+          </button>
+          <div class="text-sm text-muted" id="resend-countdown" style="display: none; margin-top: 8px;"></div>
+        </div>
+
+        <p class="auth-footer" style="margin-top: 24px;"><a href="forgot-password.html" class="link">← Change email address</a></p>
+      </div>
+    </div>
+  </div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/verify-code.js"></script>
+<script>
+  setInterval(() => {
+    document.querySelectorAll('a, div').forEach(el => {
+      if (el.textContent && el.textContent.trim() === 'Powered by Netlify') {
+        el.style.display = 'none';
+      }
+    });
+  }, 1000);
+</script>
+</body>
+</html>

@@ -18,6 +18,7 @@ const statementsRoutes = require('./routes/statements');
 const notificationsRoutes = require('./routes/notifications');
 const rewardsRoutes = require('./routes/rewards');
 const profileRoutes = require('./routes/profile');
+const passwordResetRoutes = require('./routes/passwordReset');
 
 const cors = require('cors');
 
@@ -135,6 +136,7 @@ app.use('/api', generalApiLimiter);
 app.use('/api', requireCsrfToken);
 
 app.use('/api/auth', authRoutes);
+app.use('/api/auth', passwordResetRoutes);
 app.use('/api/accounts', accountsRoutes);
 app.use('/api/cards', cardsRoutes);
 app.use('/api/transfers', transfersRoutes);

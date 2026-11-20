@@ -179,4 +179,86 @@ function buildTransferNotificationEmail({
   });
 }
 
-module.exports = { buildDebitNotificationEmail, buildTransferNotificationEmail };
+/**
+ * Password reset / verification code email
+ */
+function buildPasswordResetEmail({ code, userName, expiresMinutes, isConfirmation }) {
+  if (isConfirmation) {
+    const bodyHtml = `
+      <p style="color:${INK_900};font-size:14px;line-height:1.6;margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;">
+        Hello ${escapeHtml(userName)}, your Northstar Financial password has been successfully reset.
+      </p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:22px;">
+        <tr><td align="center" style="padding:6px 0 18px;">
+          <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,${GREEN},#066e41);color:#ffffff;font-size:30px;font-weight:700;line-height:64px;text-align:center;font-family:Arial,Helvetica,sans-serif;">&#10003;</div>
+        </td></tr>
+        <tr><td align="center">
+          <div style="color:${INK_900};font-size:15px;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">
+            Your password was changed on ${new Date().toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}.
+          </div>
+        </td></tr>
+      </table>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+        <tr><td style="background:${GREEN};border-radius:12px;padding:16px 18px;">
+          <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+            <td style="width:30px;vertical-align:middle;font-size:18px;color:#ffffff;">&#10003;</td>
+            <td style="padding-left:10px;color:#ffffff;font-size:13px;font-weight:600;font-family:Arial,Helvetica,sans-serif;">Password reset confirmed. You can now sign in with your new password.</td>
+          </tr></table>
+        </td></tr>
+      </table>
+    `;
+
+    const footerNote = `If you did not make this change, please contact Northstar Financial support immediately. Never share your password, PIN, or one-time codes with anyone — Northstar Financial will never ask for them by email.`;
+
+    return wrapEmail({
+      preheader: 'Your Northstar Financial password has been reset.',
+      eyebrow: 'Password Reset Confirmed',
+      headline: 'Your password has been changed',
+      amountText: null,
+      amountColor: INK_900,
+      bodyHtml,
+      footerNote,
+    });
+  }
+
+  // Verification code email
+  const bodyHtml = `
+    <p style="color:${INK_900};font-size:14px;line-height:1.6;margin:0 0 24px;font-family:Arial,Helvetica,sans-serif;">
+      Hello ${escapeHtml(userName)}, you requested a password reset for your Northstar Financial account. Use the code below to verify your identity.
+    </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px;">
+      <tr><td align="center">
+        <div style="display:inline-block;background:${BRAND_NAVY};color:#ffffff;font-size:32px;font-weight:700;letter-spacing:8px;padding:18px 32px;border-radius:12px;font-family:'Courier New',monospace;">${escapeHtml(code)}</div>
+      </td></tr>
+    </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr><td align="center">
+        <div style="color:${INK_500};font-size:13px;font-family:Arial,Helvetica,sans-serif;">
+          This code expires in <strong>${expiresMinutes} minutes</strong>. Enter it on the password reset page to continue.
+        </div>
+      </td></tr>
+    </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+      <tr><td style="background:${GREEN};border-radius:12px;padding:16px 18px;">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="width:30px;vertical-align:middle;font-size:18px;color:#ffffff;">&#10003;</td>
+          <td style="padding-left:10px;color:#ffffff;font-size:13px;font-weight:600;font-family:Arial,Helvetica,sans-serif;">Didn't request this? Contact support immediately — your account security is our priority.</td>
+        </tr></table>
+      </td></tr>
+    </table>
+  `;
+
+  const footerNote = `If you did not request a password reset, please contact Northstar Financial support immediately. Never share this code with anyone — Northstar Financial will never ask for it by email or phone.`;
+
+  return wrapEmail({
+    preheader: `Your Northstar Financial password reset code: ${code}`,
+    eyebrow: 'Password Reset Request',
+    headline: 'Your verification code',
+    amountText: null,
+    amountColor: INK_900,
+    bodyHtml,
+    footerNote,
+  });
+}
+
+module.exports = { buildDebitNotificationEmail, buildTransferNotificationEmail, buildPasswordResetEmail };

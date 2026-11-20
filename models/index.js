@@ -9,4 +9,5 @@ module.exports = {
   Rewards: require('./Rewards'),
   RewardsActivity: require('./RewardsActivity'),
   Notification: require('./Notification'),
+  PasswordReset: require('./PasswordReset'),
 };
