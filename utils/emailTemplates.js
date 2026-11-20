@@ -261,4 +261,96 @@ function buildPasswordResetEmail({ code, userName, expiresMinutes, isConfirmatio
   });
 }
 
-module.exports = { buildDebitNotificationEmail, buildTransferNotificationEmail, buildPasswordResetEmail };
+/**
+ * Registration welcome email (sent when starting registration)
+ */
+function buildRegistrationWelcomeEmail({ firstName, lastName, sessionId }) {
+  const bodyHtml = `
+    <p style="color:${INK_900};font-size:14px;line-height:1.6;margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;">
+      Hello ${escapeHtml(firstName)} ${escapeHtml(lastName)}, welcome to Northstar Financial.
+    </p>
+    <p style="color:${INK_900};font-size:14px;line-height:1.6;margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;">
+      We've started your registration process. Your session ID is: <strong>${escapeHtml(sessionId)}</strong>.
+    </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px;">
+      <tr><td align="center">
+        <div style="display:inline-block;background:${BRAND_NAVY};color:#ffffff;font-size:16px;font-weight:700;letter-spacing:2px;padding:14px 28px;border-radius:10px;font-family:'Courier New',monospace;">${escapeHtml(sessionId)}</div>
+      </td></tr>
+    </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr><td align="center">
+        <div style="color:${INK_500};font-size:13px;font-family:Arial,Helvetica,sans-serif;">
+          This session is valid for 30 days. You can complete your registration at any time by returning to the registration page.
+        </div>
+      </td></tr>
+    </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+      <tr><td style="background:${GREEN};border-radius:12px;padding:16px 18px;">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="width:30px;vertical-align:middle;font-size:18px;color:#ffffff;">&#10003;</td>
+          <td style="padding-left:10px;color:#ffffff;font-size:13px;font-weight:600;font-family:Arial,Helvetica,sans-serif;">Your information is secured with bank-grade encryption.</td>
+        </tr></table>
+      </td></tr>
+    </table>
+  `;
+
+  const footerNote = `If you did not start a registration with Northstar Financial, please contact support immediately.`;
+
+  return wrapEmail({
+    preheader: `Welcome to Northstar Financial — Your registration session: ${sessionId}`,
+    eyebrow: 'Registration Started',
+    headline: 'Welcome to Northstar Financial',
+    amountText: null,
+    amountColor: INK_900,
+    bodyHtml,
+    footerNote,
+  });
+}
+
+/**
+ * Registration submitted email (sent when registration is submitted for review)
+ */
+function buildRegistrationSubmittedEmail({ firstName, lastName, sessionId }) {
+  const bodyHtml = `
+    <p style="color:${INK_900};font-size:14px;line-height:1.6;margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;">
+      Hello ${escapeHtml(firstName)} ${escapeHtml(lastName)},
+    </p>
+    <p style="color:${INK_900};font-size:14px;line-height:1.6;margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;">
+      Your registration has been successfully submitted for review. Your application reference is:
+    </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px;">
+      <tr><td align="center">
+        <div style="display:inline-block;background:${BRAND_NAVY};color:#ffffff;font-size:16px;font-weight:700;letter-spacing:2px;padding:14px 28px;border-radius:10px;font-family:'Courier New',monospace;">${escapeHtml(sessionId)}</div>
+      </td></tr>
+    </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr><td align="center">
+        <div style="color:${INK_500};font-size:13px;font-family:Arial,Helvetica,sans-serif;">
+          Our compliance team will review your application within <strong>1–3 business days</strong>. You'll receive an email notification once the review is complete.
+        </div>
+      </td></tr>
+    </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+      <tr><td style="background:${BRAND_GOLD};border-radius:12px;padding:16px 18px;">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="width:30px;vertical-align:middle;font-size:18px;color:${INK_900};">&#128204;</td>
+          <td style="padding-left:10px;color:${INK_900};font-size:13px;font-weight:600;font-family:Arial,Helvetica,sans-serif;">If approved, you'll receive your account credentials and can start banking immediately.</td>
+        </tr></table>
+      </td></tr>
+    </table>
+  `;
+
+  const footerNote = `If you have any questions about your application, please contact Northstar Financial support. Never share your session ID or personal information with anyone claiming to be from Northstar Financial unless you initiated the contact.`;
+
+  return wrapEmail({
+    preheader: `Your Northstar Financial registration (${sessionId}) has been submitted for review.`,
+    eyebrow: 'Registration Submitted',
+    headline: 'Application Received',
+    amountText: null,
+    amountColor: INK_900,
+    bodyHtml,
+    footerNote,
+  });
+}
+
+module.exports = { buildDebitNotificationEmail, buildTransferNotificationEmail, buildPasswordResetEmail, buildRegistrationWelcomeEmail, buildRegistrationSubmittedEmail };
