@@ -126,8 +126,8 @@ app.use(session({
   store: MongoStore.create({ clientPromise: mongoClientPromise, collectionName: 'sessions' }),
   cookie: {
     httpOnly: true,
-    sameSite: 'none',
-    secure: true,
+    sameSite: isProduction ? 'none' : 'lax',
+    secure: isProduction,
     maxAge: 1000 * 60 * 60 * 8,
   },
 }));
