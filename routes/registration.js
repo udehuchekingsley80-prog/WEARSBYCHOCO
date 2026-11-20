@@ -1,8 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
-const { body, param, query } = require('express-validator');
+const { body, param, query, validationResult } = require('express-validator');
 const { RegistrationSession, KycDocument, User } = require('../models');
-const { handleValidation } = require('../middleware/validate');
 const { generalApiLimiter } = require('../middleware/rateLimit');
 const { sendEmail } = require('../utils/mailer');
 const { buildRegistrationWelcomeEmail, buildRegistrationSubmittedEmail } = require('../utils/emailTemplates');
@@ -17,6 +16,25 @@ const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
 // Helper: generate session ID
 function generateSessionId() {
   return 'reg_' + crypto.randomBytes(16).toString('hex');
+}
+
+// Helper: convert form data to proper types
+function convertFormData(data) {
+  if (Array.isArray(data)) {
+    return data.map(item => convertFormData(item));
+  }
+  const converted = { ...data };
+  for (const key of Object.keys(converted)) {
+    const value = converted[key];
+    if (value === 'on' || value === 'true') {
+      converted[key] = true;
+    } else if (value === 'false') {
+      converted[key] = false;
+    } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      converted[key] = convertFormData(value);
+    }
+  }
+  return converted;
 }
 
 // Helper: calculate risk score
@@ -73,6 +91,20 @@ function calculateRiskScore(session) {
   return { score, level, factors };
 }
 
+// Validation middleware factory
+function validate(validationRules) {
+  return async (req, res, next) => {
+    for (const validate of validationRules) {
+      await validate.run(req);
+    }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0].msg, errors: errors.array() });
+    }
+    next();
+  };
+}
+
 // Validation schemas for each step
 const step1Validation = [
   body('personalInfo.firstName').trim().notEmpty().withMessage('First name is required'),
@@ -89,7 +121,9 @@ const step2Validation = [
   body('addressInfo.residentialAddress.city').trim().notEmpty().withMessage('City is required'),
   body('addressInfo.residentialAddress.country').trim().notEmpty().withMessage('Country is required'),
   body('addressInfo.residentialAddress.postalCode').trim().notEmpty().withMessage('Postal code is required'),
-  body('addressInfo.mailingAddressSame').isBoolean().withMessage('Mailing address same flag required'),
+  body('addressInfo.mailingAddressSame').custom(value => {
+    return value === true || value === false || value === 'true' || value === 'false' || value === 'on';
+  }).withMessage('Mailing address same flag required'),
 ];
 
 const step3Validation = [
@@ -107,12 +141,20 @@ const step4Validation = [
 ];
 
 const step5Validation = [
-  body('complianceInfo.isPoliticallyExposed').isBoolean().withMessage('PEP status required'),
-  body('complianceInfo.hasSanctions').isBoolean().withMessage('Sanctions status required'),
+  body('complianceInfo.isPoliticallyExposed').custom(value => {
+    return value === 'true' || value === 'on' || value === true || value === false || value === 'false';
+  }).withMessage('PEP status required'),
+  body('complianceInfo.hasSanctions').custom(value => {
+    return value === 'true' || value === 'on' || value === true || value === false || value === 'false';
+  }).withMessage('Sanctions status required'),
   body('complianceInfo.fatcaStatus').isIn(['us_person', 'non_us_person', 'not_applicable']).withMessage('Valid FATCA status required'),
   body('complianceInfo.crsStatus').isIn(['reportable', 'non_reportable', 'not_applicable']).withMessage('Valid CRS status required'),
-  body('complianceInfo.termsAccepted').equals('true').withMessage('Terms must be accepted'),
-  body('complianceInfo.privacyAccepted').equals('true').withMessage('Privacy policy must be accepted'),
+  body('complianceInfo.termsAccepted').custom(value => {
+    return value === 'true' || value === 'on' || value === true;
+  }).withMessage('Terms must be accepted'),
+  body('complianceInfo.privacyAccepted').custom(value => {
+    return value === 'true' || value === 'on' || value === true;
+  }).withMessage('Privacy policy must be accepted'),
 ];
 
 /**
@@ -171,8 +213,7 @@ router.post(
  */
 router.get(
   '/:sessionId',
-  [param('sessionId').matches(/^reg_[a-f0-9]{32}$/).withMessage('Invalid session ID')],
-  handleValidation,
+  validate([param('sessionId').matches(/^reg_[a-f0-9]{32}$/).withMessage('Invalid session ID')]),
   async (req, res) => {
     try {
       const session = await RegistrationSession.findOne({ sessionId: req.params.sessionId });
@@ -217,8 +258,7 @@ router.get(
 router.put(
   '/:sessionId/step/:step',
   generalApiLimiter,
-  [param('sessionId').matches(/^reg_[a-f0-9]{32}$/).withMessage('Invalid session ID')],
-  handleValidation,
+  validate([param('sessionId').matches(/^reg_[a-f0-9]{32}$/).withMessage('Invalid session ID')]),
   async (req, res) => {
     try {
       const step = parseInt(req.params.step, 10);
@@ -254,28 +294,30 @@ router.put(
         for (const validate of validationMiddleware) {
           await validate.run(req);
         }
-        const errors = handleValidation(req, res, () => {});
-        if (errors) return;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ error: errors.array()[0].msg, errors: errors.array() });
+        }
       }
 
       // Update session with step data
       const updateData = {};
       switch (step) {
         case 1:
-          updateData.personalInfo = req.body.personalInfo;
+          updateData.personalInfo = convertFormData(req.body.personalInfo);
           break;
         case 2:
-          updateData.addressInfo = req.body.addressInfo;
+          updateData.addressInfo = convertFormData(req.body.addressInfo);
           break;
         case 3:
-          updateData.identityInfo = { ...session.identityInfo, ...req.body.identityInfo };
+          updateData.identityInfo = { ...session.identityInfo, ...convertFormData(req.body.identityInfo) };
           break;
         case 4:
-          updateData.financialInfo = req.body.financialInfo;
+          updateData.financialInfo = convertFormData(req.body.financialInfo);
           break;
         case 5:
           updateData.complianceInfo = {
-            ...req.body.complianceInfo,
+            ...convertFormData(req.body.complianceInfo),
             termsAcceptedAt: new Date(),
             privacyAcceptedAt: new Date(),
           };
@@ -287,7 +329,7 @@ router.put(
         session.stepsCompleted.push(step);
         session.stepsCompleted.sort((a, b) => a - b);
       }
-      session.currentStep = Math.max(session.currentStep, step + 1);
+      session.currentStep = step === 5 ? 5 : Math.max(session.currentStep, step + 1);
       Object.assign(session, updateData);
 
       // Calculate risk score after step 4
@@ -325,8 +367,7 @@ router.put(
 router.post(
   '/:sessionId/submit',
   generalApiLimiter,
-  [param('sessionId').matches(/^reg_[a-f0-9]{32}$/).withMessage('Invalid session ID')],
-  handleValidation,
+  validate([param('sessionId').matches(/^reg_[a-f0-9]{32}$/).withMessage('Invalid session ID')]),
   async (req, res) => {
     try {
       const session = await RegistrationSession.findOne({ sessionId: req.params.sessionId });
@@ -401,8 +442,7 @@ router.post(
 router.post(
   '/:sessionId/upload',
   generalApiLimiter,
-  [param('sessionId').matches(/^reg_[a-f0-9]{32}$/).withMessage('Invalid session ID')],
-  handleValidation,
+  validate([param('sessionId').matches(/^reg_[a-f0-9]{32}$/).withMessage('Invalid session ID')]),
   async (req, res) => {
     try {
       // This endpoint expects multipart/form-data with file upload
@@ -425,8 +465,7 @@ router.post(
  */
 router.get(
   '/:sessionId/documents',
-  [param('sessionId').matches(/^reg_[a-f0-9]{32}$/).withMessage('Invalid session ID')],
-  handleValidation,
+  validate([param('sessionId').matches(/^reg_[a-f0-9]{32}$/).withMessage('Invalid session ID')]),
   async (req, res) => {
     try {
       const session = await RegistrationSession.findOne({ sessionId: req.params.sessionId });
